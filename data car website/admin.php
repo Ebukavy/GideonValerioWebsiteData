@@ -9,29 +9,28 @@ if (!isset($_SESSION['admin'])) {
 include('db.php');
 $db = new Database();
 
-// Admin Logout
-if (isset($_POST['logout'])) {
-    session_destroy();
-    header("Location: login.php");
-    exit();
-}
-
-// Handle form submissions
 if (isset($_POST['addCustomer'])) {
     $name = $_POST['name'];
     $password = $_POST['password'];
-    // Add logic to insert the new customer into the database
     $db->addNewCustomer($name, $password);
+}
+
+if (isset($_POST['deleteReservation'])) {
+    $reservationId = $_POST['deleteReservation'];
+    $db->deleteReservation($reservationId);
+}
+
+if (isset($_POST['deleteCustomer'])) {
+    $customerId = $_POST['deleteCustomer'];
+    $db->deleteCustomer($customerId);
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add your head content here -->
     <style>
-        /* Add your CSS styling here */
-        body {
+         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -55,6 +54,23 @@ if (isset($_POST['addCustomer'])) {
             margin-bottom: 15px;
             padding: 8px;
             width: 100%;
+        }
+
+        .back-to-home {
+            margin-top: 20px;
+        }
+
+        .back-to-home button {
+            padding: 10px 15px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-to-home button:hover {
+            background-color: #555;
         }
 
         input[type="submit"] {
@@ -84,6 +100,11 @@ if (isset($_POST['addCustomer'])) {
     </style>
 </head>
 <body>
+    <div class="back-to-home">
+        <form method="get" action="home.php">
+            <button type="submit">Back to Home Page</button>
+        </form>
+    </div>
 
     <h1>Admin Dashboard</h1>
 
@@ -98,6 +119,11 @@ if (isset($_POST['addCustomer'])) {
             echo '<p><strong>Customer/Admin:</strong> ' . $reservation['name'] . '</p>';
             echo '<p><strong>Car Model:</strong> ' . $reservation['model'] . '</p>';
             echo '<p><strong>Rental Date:</strong> ' . $reservation['rental_date'] . '</p>';
+            echo '<p><strong>ID:</strong> ' . $reservation['user_id'] . '</p>';
+            echo '<form method="post" action="admin.php">';
+            echo '<input type="hidden" name="deleteReservation" value="' . $reservation['user_id'] . '">';
+            echo '<input type="submit" value="Delete Reservation">';
+            echo '</form>';
             echo '</li>';
         }
         echo '</ul>';
@@ -106,7 +132,6 @@ if (isset($_POST['addCustomer'])) {
     }
     ?>
 
-    <!-- View All Customers -->
     <h2>All Customers</h2>
     <?php
     $allCustomers = $db->getAllCustomers();
@@ -117,7 +142,10 @@ if (isset($_POST['addCustomer'])) {
             echo '<li>';
             echo '<p><strong>Name:</strong> ' . $customer['name'] . '</p>';
             echo '<p><strong>Email:</strong> ' . $customer['email'] . '</p>';
-            // Add other customer details to display
+            echo '<form method="post" action="admin.php">';
+            echo '<input type="hidden" name="deleteCustomer" value="' . $customer['ID'] . '">';
+            echo '<input type="submit" value="Delete Customer">';
+            echo '</form>';
             echo '</li>';
         }
         echo '</ul>';
@@ -126,7 +154,6 @@ if (isset($_POST['addCustomer'])) {
     }
     ?>
 
-    <!-- Add New Customer Form -->
     <h2>Add New Customer</h2>
     <form method="post">
         <label for="name">Name:</label>
