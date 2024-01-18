@@ -1,5 +1,4 @@
 <?php
-// Start the session
 session_start();
 ?>
 
@@ -92,8 +91,7 @@ session_start();
         <h2></h2>
 
         <?php
-        // Your existing code for displaying the cart items
-        // ...
+
 
         ?>
         
