@@ -13,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user) {
         $_SESSION['user'] = $user;
+        $_SESSION['user']['id'] = $user['id'];
         $_SESSION['admin'] = ($user['Role'] == 'admin');
         header("Location: loggedin.php");
         exit();
