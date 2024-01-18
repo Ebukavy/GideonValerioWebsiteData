@@ -1,11 +1,25 @@
 <?php
 session_start();
 
+include('db.php');
+
+$db = new Database();
+
+
 if (isset($_GET['action']) && $_GET['action'] == 'buy' && isset($_GET['model']) && isset($_GET['price'])) {
     $model = urldecode($_GET['model']);
     $price = urldecode($_GET['price']);
+
+    $customerId = isset($_SESSION['user']['ID']) ? $_SESSION['user']['ID'] : null;
+
+    if ($customerId) {
+        $db->addNewRental($customerId, $model);
+        echo "Successfully rented and added to rentals: $model, $price";
+    } else {
+        echo "Error: Customer ID not found.";
+    }
+
     $_SESSION['cart'][] = array('model' => $model, 'price' => $price);
-    echo "Successfully added to cart: $model, $price";
 } else {
     echo "Invalid request.";
 }
