@@ -4,20 +4,17 @@ session_start();
 include('db.php');
 
 $db = new Database();
-$registrationSuccess = false; // Initialize the variable
+$registrationSuccess = false; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST["name"];
     $password = $_POST["password"];
     $email = $_POST["email"];
 
-    // Assign the default role as "customer"
     $role = 'customer';
 
-    // Add the new user to the database with the default role
     $db->addNewCustomer($name, $password, $email, $role);
 
-    // Set the variable to true if the registration was successful
     $registrationSuccess = true;
 }
 ?>
