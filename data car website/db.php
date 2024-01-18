@@ -10,7 +10,6 @@ class Database {
             echo "Error: " . $e->getMessage();
         }
     }
-    
 
     public function getReservedCarsForToday() {
         $today = date("Y-m-d");
@@ -18,7 +17,7 @@ class Database {
         $stmt->execute([$today]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     public function loginUser($identifier, $password) {
         $stmt = $this->pdo->prepare("SELECT * FROM user WHERE name = :identifier OR email = :identifier");
         $stmt->execute(['identifier' => $identifier]);
@@ -37,9 +36,9 @@ class Database {
     }
 
     public function getAllReservations() {
-        $stmt = $this->pdo->query("SELECT user.name, rentals.rental_date 
+        $stmt = $this->pdo->query("SELECT user.name, rentals.model, rentals.rental_date, rentals.user_id
                                   FROM user 
-                                  INNER JOIN rentals ON user.id = rentals.ID");
+                                  INNER JOIN rentals ON user.id = rentals.user_id");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
@@ -57,15 +56,47 @@ class Database {
     public function addNewCustomer($name, $password) {
         $role = 'customer';
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    
+
         $stmt = $this->pdo->prepare("INSERT INTO user (name, password, role) VALUES (?, ?, ?)");
         $stmt->execute([$name, $hashedPassword, $role]);
     }
+
+    public function addNewReservation($customerId, $model, $rentalDate) {
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO rentals (user_id, model, rental_date) VALUES (?, ?, ?)");
+            $stmt->execute([$customerId, $model, $rentalDate]);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+    
+    
+    public function deleteCustomer($customerId) {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM user WHERE id = ?");
+            $stmt->execute([$customerId]);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+
+    public function deleteReservation($reservationId) {
+        $stmt = $this->pdo->prepare("DELETE FROM rentals WHERE user_id = ?");
+        $stmt->execute([$reservationId]);
+    }
     
 
-    public function addNewReservation($customerId, $carModel, $rentalDate) {
-        $stmt = $this->pdo->prepare("INSERT INTO rentals (ID, model, rental_date) VALUES (?, ?, ?)");
-        $stmt->execute([$customerId, $carModel, $rentalDate]);
+    public function addNewRental($customerId, $model) {
+        try {
+            $rentalDate = date("Y-m-d");
+            $stmt = $this->pdo->prepare("INSERT INTO rentals (user_id, model, rental_date) VALUES (?, ?, ?)");
+            $stmt->execute([$customerId, $model, $rentalDate]);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
+    
+    
 }
 ?>
